@@ -4,3 +4,23 @@ configVersion: 2
 description: testing
 keywords: ''
 name: stocks
+
+dataTypes:
+  stockInfo:
+    name: string
+    symbol: string
+    currentStockPrice: float
+    changeInPercent: float
+    dividendYield: float
+    dividendPerShare: float
+
+screens:
+  - - stockInfo
+
+widgets:
+  stockInfo:
+    display: label
+    type: stockInfo
+    key: name
+    label: Stock:
+      
