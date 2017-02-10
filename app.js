@@ -1,6 +1,14 @@
 var yahooFinance = require('yahoo-finance');
 
 ///////////////////
+// Event Listners
+///////////////////
+var animation = new EventEmitter();
+//start animation
+
+//continue here.......................................................
+
+///////////////////
 // Get Stock Info
 ///////////////////
 
@@ -16,8 +24,24 @@ var yahooFinance = require('yahoo-finance');
     var name = data.name;
     var symbol = data.symbol;
     var currentStockPrice = data.lastTradePriceOnly;
-    var changeInPercent = data.changeInPercent;
+    var changeInPercent = data.changeInPercent * 100;
     var dividendYield = data.dividendYield;
     var dividendPerShare = data.dividendPerShare;
 
  });
+
+ ///////////////////////////
+ // turns on led % change
+ ///////////////////////////
+function runPercentChange(percentChange){
+
+    //positive percentChange
+    if(changeInPercent > 0.0)
+        matrix.led("green").render();
+    // negative percentChange
+    else if(changeInPercent < 0.0)
+        matrix.led("red").render();
+    // no percentChange
+    else
+        matrix.led("yellow").render();
+}
