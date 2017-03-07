@@ -1,26 +1,57 @@
 # do not touch this line
 configVersion: 2
 
-description: testing
-keywords: ''
+description: Displays the info of the stock you wish to view.
+keywords: 'stock market, stocks'
 name: stocks
+displayName: Stocks
+
+galleryImageUrls: http://icons.iconarchive.com/icons/double-j-design/apple-festival/256/app-stock-icon.png
+
+events:
+  - stockInput
 
 dataTypes:
   stockInfo:
-    name: string
-    symbol: string
-    currentStockPrice: float
-    changeInPercent: float
-    dividendYield: float
-    dividendPerShare: float
+    stockName: string
+  stockInfo2:
+    currentStockPrice: string
+  stockInfo3:
+    changeInPercent: string
+  stockInfo4:
+    changeInPrice: string
+
 
 screens:
+  - - choseStock
   - - stockInfo
+  - - stockInfo2
+  - - stockInfo4
+  - - stockInfo3
 
 widgets:
+  choseStock:
+    control: input
+    event: stockInput
+    value: 'Type the symbol of the Stock you want'
+    label: 'Choose your Stock'
   stockInfo:
     display: label
     type: stockInfo
-    key: name
-    label: Stock:
-      
+    key: stockName
+    label: Stock Name
+  stockInfo2:
+    display: label
+    type: stockInfo2
+    key: currentStockPrice
+    label: Stock Price
+  stockInfo3:
+    display: label
+    type: stockInfo3
+    key: changeInPercent
+    label: Percent Change
+  stockInfo4:
+    display: label
+    type: stockInfo4
+    key: changeInPrice
+    label: Change in Price

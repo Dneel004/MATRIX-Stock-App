@@ -1,6 +1,6 @@
 {
   "name": "baseapp.matrix",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,6 @@
     "cheerio": "^0.22.0",
     "cpu-stats": "^1.0.0",
     "lodash": "^4.17.4",
-    "request": "^2.79.0",
-    "yahoo-finance": "^0.2.16"
+    "request": "^2.79.0"
   }
 }

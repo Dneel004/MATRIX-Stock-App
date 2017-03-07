@@ -1,74 +1,121 @@
-var yahooFinance = require('yahoo-finance');
 
-///////////////////
-// Event Listners
-///////////////////
-//var animation = new EventEmitter();
-//start animation
-
-//continue here.......................................................
 
 ///////////////////
 // Get Stock Info
 //////////////////
 //Initializing all variables
-var name = "";
+var stocks = {};
+var stockName = "";
 var symbol = "";
 var currentStockPrice = 0.0;
-var changeInPercent = changeInPercent;
-var dividendYield = 0.0;
-var dividendPerShare = 0.0;
+var changeInPrice = 0.0;
+var changeInPercent = 0.0;
+var stockSymbol = "AAPL";
 
-function getStockData(name, symbol, currentStockPrice, changeInPercent, dividendYield, dividendPerShare){
-   yahooFinance.snapshot({
-     symbol: "AAPL",
-     fields: ['s','n','l1', 'p2','y', 'd' ]
-   }, function(err, data){
-      if(err)
-        console.log(err);
-      console.log(data);
-      console.log(data.name);
-      // setting all the variables
-      var name = data.name;
-      var symbol = data.symbol;
-      var currentStockPrice = data.lastTradePriceOnly;
-      var changeInPercent = data.changeInPercent;
-      var dividendYield = data.dividendYield;
-      var dividendPerShare = data.dividendPerShare;
 
-   });
-};
-//test getting data
-console.log(getStockData(name, symbol, currentStockPrice, changeInPercent, dividendYield, dividendPerShare));
+///////////////////////
+// Get the stock symbol
+///////////////////////
 
-// turns on led % change
-function runPercentChange(){
-  var percentLevel = changeInPercent;
-  var position = 150
+matrix.on('stockInput', function(input){
+        console.log(input);
+        var stockInput = input.value.toUpperCase();
+        stockSymbol = stockInput;
+        console.log(input.value, input);
+        getYahooData(stockSymbol, function(){
+          runPercentChange();
+        });
+
+
+});
+var loadingLoop;
+function loading(){
+  var counter = 0;
   var increase = Math.PI / 180;
 
-  setInterval(function(){
-    //positive percentChange
+  loadingLoop = setInterval(function(){
+
+    var stockBar = {
+    			arc: 60,
+    			color: 'rgba(0,0,230,1)',
+    			start: counter,
+    			blend: false
+    		};
+
+        counter += 5;
+        if(counter >= 360){
+          counter = 0;
+        }
+
+        matrix.led(stockBar).render();
+  }, 60);
+}
+
+//Get all variables
+var https = require('https');
+function getYahooData(stockSymbol, callback){
+  var dataLoop = https.get('https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%22'+stockSymbol+'%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=', function(response){
+    response.on('data', function(data){
+      try{
+        stocks = JSON.parse(data);
+        stockName = stocks.query.results.quote.Name;
+        symbol = stocks.query.results.quote.symbol;
+        currentStockPrice = stocks.query.results.quote.LastTradePriceOnly;
+        changeInPrice = stocks.query.results.quote.Change;
+        changeInPercent = (changeInPrice / currentStockPrice) * 100;
+        changeInPercent = changeInPercent.toFixed(2);
+        matrix.type('stockInfo').send({
+          'stockName': stockName
+        });
+        matrix.type('stockInfo2').send({
+          'currentStockPrice': currentStockPrice
+        });
+        matrix.type('stockInfo4').send({
+          'changeInPrice': changeInPrice
+        });
+        matrix.type('stockInfo3').send({
+          'changeInPercent': changeInPercent + "%"
+        });
+        console.log(stockName, symbol, currentStockPrice, changeInPrice, changeInPercent);
+      }catch(error){
+        console.log(error+"\n COULD NOT LOAD DATA!");
+      }
+    });
+  });
+  callback();
+}
+
+function runPercentChange(){
     if(changeInPercent > 0.0){
-          var showChange = {
-            arc: 30 + percentLevel,
-            start: position - percentLevel,
-            color: green,
-          };
-          matrix.led(showChange).render();
+          matrix.led('green').render();
     }
     // negative percentChange
     else if(changeInPercent < 0.0){
-          var showChange = {
-            arc: 30 + percentLevel,
-            start: position - percentLevel,
-            color: green,
-          };
-          matrix.led(showChange).render();
+          matrix.led('red').render();
+    }
+    else if(changeInPercent == "null"){
+      if(changeInPrice > 0.0){
+            matrix.led('green').render();
+      }
+      // negative percentChange
+      else if(changeInPrice < 0.0){
+            matrix.led('red').render();
+      }
     }
     // no percentChange
-    else
-        matrix.led("yellow").render();
-  },5000);
-
+    else{
+      loading();
+    }
 }
+
+
+//gets data every X amount of seconds and runs the percentchange method
+getYahooData(stockSymbol, function(){
+    runPercentChange();
+  });
+  setInterval(function(){
+    getYahooData(stockSymbol, function(){
+      clearInterval(loadingLoop);
+      runPercentChange();
+    });
+  },20000);
