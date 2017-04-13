@@ -22,6 +22,7 @@ matrix.on('stockInput', function(input){
         var stockInput = input.value.toUpperCase();
         stockSymbol = stockInput;
         console.log(input.value, input);
+        changeInPercent = 0.0;//reset for new stock data
         getYahooData(stockSymbol, function(){
           runPercentChange();
         });
@@ -87,20 +88,27 @@ function getYahooData(stockSymbol, callback){
 
 function runPercentChange(){
     if(changeInPercent > 0.0){
-          matrix.led('green').render();
+        matrix.led('green').render();
     }
     // negative percentChange
     else if(changeInPercent < 0.0){
-          matrix.led('red').render();
+        matrix.led('red').render();
     }
     else if(changeInPercent == "null"){
       if(changeInPrice > 0.0){
-            matrix.led('green').render();
+          matrix.led('green').render();
       }
       // negative percentChange
-      else if(changeInPrice < 0.0){
-            matrix.led('red').render();
+      else if(changeInPrice < 0){
+          matrix.led('red').render();
       }
+      else {
+          matrix.led('yellow').render();
+      }
+
+    }
+    else if(changeInPrice === 0){
+        matrix.led('yellow').render();
     }
     // no percentChange
     else{
@@ -118,4 +126,4 @@ getYahooData(stockSymbol, function(){
       clearInterval(loadingLoop);
       runPercentChange();
     });
-  },20000);
+  },10000);

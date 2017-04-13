@@ -6,7 +6,10 @@ keywords: 'stock market, stocks'
 name: stocks
 displayName: Stocks
 
-galleryImageUrls: http://icons.iconarchive.com/icons/double-j-design/apple-festival/256/app-stock-icon.png
+imageUrls:
+  - https://storage.googleapis.com/admobilize-assets/matrix-appstore-images-tmp/app-tn/stocks.jpg
+
+galleryUrl: https://storage.googleapis.com/admobilize-assets/matrix-appstore-images-tmp/app-tn/stocks-g.png
 
 events:
   - stockInput
